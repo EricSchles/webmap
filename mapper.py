@@ -2,6 +2,8 @@ import requests
 import lxml.html
 
 def link_grab(url,base_url):
+    """Returns all complete links on the page.  
+    Aka all those links who include the base url in the link."""
     base = ""
     if "//" in base_url:
         base = base_url.split("//")[1]
@@ -25,16 +27,22 @@ def link_grab(url,base_url):
     return links
 
 def map_website(base_url,depth):
-    basis = link_grab(base_url,base_url)
     link_list = []
-    count = 0
-    while count < depth:
-        #print link_grab(base_url) #check to ensure things still work    
-        for links in basis:
-            tmp = link_grab(links,base_url)
-            for link in tmp:
-                if link in link_list:
-                    continue
-                link_list.append(link)
-        count += 1
+    return map_website(base_url,base_url,depth,link_list)
+
+def map_website(url,base_url,depth,link_list):
+    if depth <= 0:
+        return link_list
+    links_on_page = link_grab(url,base_url)
+    tmp = []
+    for link in links_on_page:
+        if not link in link_list:
+            link_list.append(link)
+            tmp = map_website(link,base_url,depth-1,link_list)
+            for elem in tmp:
+                if not elem in link_list:
+                    link_list.append(elem)
     return link_list
+    
+
+print map_website("https://www.google.com",2)
