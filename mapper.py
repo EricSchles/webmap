@@ -1,5 +1,6 @@
 import requests
 import lxml.html
+import time
 
 def link_grab(url,base_url):
     """Returns all links on the page.  
@@ -46,7 +47,7 @@ def link_grab(url,base_url):
         links.append(link)
     return links
 
-def map_website(base_url,depth):
+def map_links(base_url,depth):
     link_list = []
     return mapper(base_url,base_url,depth,link_list)
 
@@ -64,5 +65,49 @@ def mapper(url,base_url,depth,link_list):
                     link_list.append(elem)
     return link_list
     
-# print link_grab("https://www.google.com","https://www.google.com")
-# print len(map_website("https://www.google.com",3))
+def pdf_grab(url,depth):
+    links = map_website(url,depth)
+    pdfs = []
+    for link in links:
+        if ".pdf" in link:
+            pdfs.append(link)
+    return pdfs
+
+def image_grab(url,base_url):
+    """Returns all images on the website."""        
+    time.sleep(2)
+    r = requests.get(url)
+    obj = lxml.html.fromstring(r.text)
+    img_obj = obj.xpath("//img")
+
+    images = []
+    for link in img_obj:
+         img_link = [elem for elem in link.values()] 
+         if img_link != []:
+             for elem in img_link:
+                 if img_check(elem):
+                     if base_url.endswith("/"):
+                         if elem.startswith("/"):
+                             elem = elem.lstrip("/")
+                             elem = base_url + elem
+                     else:
+                         elem = base_url + elem
+                     images.append(elem)
+    return images
+
+def img_check(img_url):
+    if img_url.endswith(".gif") or img_url.endswith(".jpg") or img_url.endswith(".png"):
+        return True
+    return False
+
+
+def map_images(base_url,depth):
+    links = map_links(base_url,depth)
+
+    img_links = []
+    for link in links:
+        for img in image_grab(link,base_url):
+            img_links.append(img)
+
+    return img_links
+
