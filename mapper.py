@@ -6,7 +6,7 @@ Functions for the user:
 
 map_images(base_url,depth): Gets the links for all the images on a given set of web pages
 
-pdf_grab(url,depth): Gets the links for all the pdfs on a given set of web pages
+map_pdfs(url,depth): Gets the links for all the pdfs on a given set of web pages
 
 map_links(base_url,depth): Gets all the links for all the pages of a given website, upto a certain depth.
 
@@ -72,7 +72,7 @@ def mapper(url,base_url,depth,link_list):
                     link_list.append(elem)
     return link_list
     
-def pdf_grab(url,depth):
+def map_pdfs(url,depth):
     """Grabs all the pdfs on a given set of pages."""
     links = map_website(url,depth)
     pdfs = []
