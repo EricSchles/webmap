@@ -102,6 +102,8 @@ def img_check(img_url):
 
 
 def map_images(base_url,depth):
+    """Grabs all urls of images on a given website, use depth to determine how much of the website should be visited"""
+    
     links = map_links(base_url,depth)
 
     img_links = []
