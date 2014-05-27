@@ -5,11 +5,6 @@ import time
 def link_grab(url,base_url):
     """Returns all links on the page.  
     Aka all those links who include the base url in the link."""
-    # base = ""
-    # if "//" in base_url:
-    #     base = base_url.split("//")[1]
-    # if "/" in base:
-    #     base = base.split("/")[0]
         
     r = requests.get(url)
     obj = lxml.html.fromstring(r.text)
@@ -52,6 +47,7 @@ def map_links(base_url,depth):
     return mapper(base_url,base_url,depth,link_list)
 
 def mapper(url,base_url,depth,link_list):
+    """Grabs all the links on a given set of pages, does this recursively."""
     if depth <= 0:
         return link_list
     links_on_page = link_grab(url,base_url)
@@ -66,6 +62,7 @@ def mapper(url,base_url,depth,link_list):
     return link_list
     
 def pdf_grab(url,depth):
+    """Grabs all the pdfs on a given set of pages."""
     links = map_website(url,depth)
     pdfs = []
     for link in links:
@@ -74,7 +71,7 @@ def pdf_grab(url,depth):
     return pdfs
 
 def image_grab(url,base_url):
-    """Returns all images on the website."""        
+    """Returns all images on the page."""        
     time.sleep(2)
     r = requests.get(url)
     obj = lxml.html.fromstring(r.text)
@@ -96,6 +93,7 @@ def image_grab(url,base_url):
     return images
 
 def img_check(img_url):
+    """Checks to see if a given link has a img extension.  Specifically checks for png, jpg, and gif image types."""
     if img_url.endswith(".gif") or img_url.endswith(".jpg") or img_url.endswith(".png"):
         return True
     return False
