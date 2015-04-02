@@ -19,40 +19,25 @@ def link_grab(url,base_url):
         
     r = requests.get(url)
     obj = lxml.html.fromstring(r.text)
-    links_obj = obj.xpath("//a")
+    potential_links = obj.xpath("//a/@href")
 
     links = []
-    incomplete_links = [] 
-
-    for link in links_obj:
-        fully_qualified = [elem for elem in link.values() if elem.startswith(base_url)] #fully qualified link as in https://www.google.com/services/
-        partial_links = [elem for elem in link.values()] # not fully qualified as in /int1/en/policies/
-
-        for ind,item in enumerate(partial_links):
-            if item in fully_qualified:
-                partial_links.pop(ind)
-
-        if fully_qualified != []:
-            elem = fully_qualified.pop()
-            links.append(elem)
-        if partial_links != []:
-            elem = partial_links.pop()
-            if "/" in elem:
-                incomplete_links.append(elem)
-    
-    for link in incomplete_links:
-        if link.startswith("http"):
+    for link in potential_links:
+        if base_url in link:
             links.append(link)
-            continue
-        if base_url.endswith("/"):
-            if link.startswith("/"):
-                link = link.lstrip("/")
-                link = base_url + link
         else:
-            link = base_url + link
-        links.append(link)
+            if link.startswith("http"):
+                links.append(link)
+        
+            if base_url.endswith("/"):
+                if link.startswith("/"):
+                    link = link.lstrip("/")
+                    link = base_url + link
+                else:
+                    link = base_url + link
+                links.append(link)
     return links
-
+    
 def map_links(base_url,depth):
     link_list = []
     return mapper(base_url,base_url,depth,link_list)
