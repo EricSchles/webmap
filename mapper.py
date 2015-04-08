@@ -14,9 +14,9 @@ Recommended depth: 3 - 6 (otherwise request may time out)
 """
 
 def link_grab(url,base_url):
-    """Returns all links on the page.  
+    """Returns all links on the page.
     Aka all those links who include the base url in the link."""
-        
+
     r = requests.get(url)
     obj = lxml.html.fromstring(r.text)
     potential_links = obj.xpath("//a/@href")
@@ -26,9 +26,20 @@ def link_grab(url,base_url):
         if base_url in link:
             links.append(link)
         else:
-            if link.startswith("http"):
+            if link.startswith("http://") or link.startswith("https://"):
                 links.append(link)
-        
+			else:
+				link = "https://"+link
+				try:
+					requests.get(link)
+				except requests.ConnectionError:
+					link = "http://"+link.replace("https://","")
+					try:
+						requests.get(link)
+					except requests.ConnectionError:
+						continue
+					links.append(link)
+
             if base_url.endswith("/"):
                 if link.startswith("/"):
                     link = link.lstrip("/")
@@ -37,7 +48,7 @@ def link_grab(url,base_url):
                     link = base_url + link
                 links.append(link)
     return links
-    
+
 def map_links(base_url,depth):
     link_list = []
     return mapper(base_url,base_url,depth,link_list)
@@ -56,7 +67,7 @@ def mapper(url,base_url,depth,link_list):
                 if not elem in link_list:
                     link_list.append(elem)
     return link_list
-    
+
 def map_pdfs(url,depth):
     """Grabs all the pdfs on a given set of pages."""
     links = map_website(url,depth)
@@ -67,7 +78,7 @@ def map_pdfs(url,depth):
     return pdfs
 
 def image_grab(url,base_url):
-    """Returns all images on the page."""        
+    """Returns all images on the page."""
     time.sleep(2)
     r = requests.get(url)
     obj = lxml.html.fromstring(r.text)
@@ -75,7 +86,7 @@ def image_grab(url,base_url):
 
     images = []
     for link in img_obj:
-         img_link = [elem for elem in link.values()] 
+         img_link = [elem for elem in link.values()]
          if img_link != []:
              for elem in img_link:
                  if img_check(elem):
@@ -97,7 +108,7 @@ def img_check(img_url):
 
 def map_images(base_url,depth):
     """Grabs all urls of images on a given website, use depth to determine how much of the website should be visited"""
-    
+
     links = map_links(base_url,depth)
 
     img_links = []
@@ -106,4 +117,3 @@ def map_images(base_url,depth):
             img_links.append(img)
 
     return img_links
-
