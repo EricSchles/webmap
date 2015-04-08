@@ -28,18 +28,18 @@ def link_grab(url,base_url):
         else:
             if link.startswith("http://") or link.startswith("https://"):
                 links.append(link)
-			else:
-				link = "https://"+link
-				try:
-					requests.get(link)
-				except requests.ConnectionError:
-					link = "http://"+link.replace("https://","")
-					try:
-						requests.get(link)
-					except requests.ConnectionError:
-						continue
-					links.append(link)
-
+            else:
+                link = "https://"+link
+                try:
+                    requests.get(link)
+                except requests.ConnectionError:
+                    link = "http://"+link.replace("https://","")
+                    try:
+                        requests.get(link)
+                    except requests.ConnectionError:
+                        continue
+                links.append(link)
+                    
             if base_url.endswith("/"):
                 if link.startswith("/"):
                     link = link.lstrip("/")
